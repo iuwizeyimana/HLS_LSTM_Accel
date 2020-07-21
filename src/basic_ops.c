@@ -4,22 +4,20 @@
 void block_maltmul(hls::stream<blc_vec>& weights, hls::stream<blc_vec>& activation, b_mat& mult_out, DTYPE iteration)
 {
 
-	// this is a block matric multiplication that is weight stationary
-  // meaning that the weight are kept in the buffer until > tot_B_num
 	//the "Parallel Programing for FPGAs: The HLS Book" chapt 6 by by Ryan Kastner was used as reference
 	#pragma HLS DATAFLOW
 	int counter = iteration % (tot_B_num/mult_num_block);
 
-	static DTYPE int_weight[mult_num_block][tot_B_num]; // in my e.g a 2 by 4
-	if(counter == 0) { //only load the weights when necessary
-		loadW: for (int i = 0; i<tot_B_num; i++)
+	static DTYPE int_act[mult_num_block][tot_B_num]; // internal activation in my e.g a 2 by 4
+	if(counter == 0) { //only load the input activations when necessary
+	loadA:         for (int i = 0; i<tot_B_num; i++)
 			{
 				#pragma HLS unroll factor = 2
-				blockvec tempW = weights.read();
+				blc_vec tempA = activation.read();
 				for (int j = 0; j < mult_num_block; j++)
 				{
 					#pragma HLS PIPELINE II = 1
-					int_weight[j][i] = tempW.a[j];
+					int_act[j][i] = tempA.a[j];
 				}
 			}
 	}
@@ -27,14 +25,14 @@ void block_maltmul(hls::stream<blc_vec>& weights, hls::stream<blc_vec>& activati
  	DTYPE int_part[mult_num_block][mult_num_block] = {0};
 	partialmult : for (int k = 0; k<tot_B_num; k++)
 	{
-		blc_vec tempA = activation.read();
+		blc_vec tempW = weights.read();
 		for (int i = 0; i < mult_num_block; i++)
 		{
 			#pragma HLS PIPELINE II = 1
 			for (int j = 0; j< mult_num_block; j++)
 			{
 				#pragma HLS PIPELINE II = 1
-				int_part[i][j] = int_part[i][j] + int_weight[i][k] * tempA.a[j];
+				int_part[i][j] = int_part[i][j] + int_act[i][k] * tempW.a[j];
 			}
 		}
 	}
