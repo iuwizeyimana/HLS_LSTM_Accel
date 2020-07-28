@@ -1,4 +1,4 @@
-#ifndef basic_ops_H-
+#ifndef basic_ops_H_
 #define basic_ops_H_
 #include "hls_stream.h"
 #include <hls_math.h>
@@ -18,11 +18,14 @@ typedef struct{
 	DTYPE inputs[mult_num_block];} blc_vec; //block vector with tot_B_num elements
 
 typedef struct{
-	DTYPE outputs[mult_num_block][mult_num_block];} b_mat;
+	DTYPE a[mult_num_block][mult_num_block];} b_mat;
 //b_mat = the block of matrix multiply that will be computed 2 by 2 in our example
 
+typedef struct{
+	DTYPE in[mult_num_block][total_B_num];} int_mem;
+
 //matrix multiplication
-void block_maltmul(hls::stream<blc_vec>& weights, hls::stream<blc_vec>&activation, b_mat & mult_out, DTYPE iteration);
+void block_maltmul(hls::stream<blc_vec>& weights, int_act& activation, b_mat & mult_out);
 
 //addition
 void addition(b_mat& partial1, b_mat& partial2, b_mat& sum);
