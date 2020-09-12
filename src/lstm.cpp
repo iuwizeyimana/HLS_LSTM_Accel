@@ -15,7 +15,7 @@ void LSTM(
 	  hls::stream<b_vec>& x_f_1,
 
 	  hls::stream<b_mat>& h_t_1,
-	  hls::stream<b_vec>& w_xo_2, // seconf weight blocks
+	  hls::stream<b_vec>& w_xo_2, // second weight blocks
 	  hls::stream<b_vec>& w_ho_2,
 	  hls::stream<b_vec>& w_xi_2,
 	  hls::stream<b_vec>& w_hi_2,
